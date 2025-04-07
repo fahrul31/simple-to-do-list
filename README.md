@@ -1,6 +1,6 @@
 # Daftar To-Do Sederhana
 
-Aplikasi daftar to-do sederhana yang dibuat menggunakan HTML, CSS, dan JavaScript. Aplikasi ini memungkinkan pengguna untuk menambah, menandai sebagai selesai, dan menghapus tugas. Cocok untuk mengelola tugas harian atau mencatat item penting.
+Aplikasi daftar to-do sederhana yang dibuat menggunakan HTML, Tailwind CSS, dan JavaScript. Aplikasi ini memungkinkan pengguna untuk menambah, menandai sebagai selesai, dan menghapus tugas. Cocok untuk mengelola tugas harian atau mencatat item penting.
 
 ## Fitur
 - Menambah tugas baru
@@ -9,5 +9,5 @@ Aplikasi daftar to-do sederhana yang dibuat menggunakan HTML, CSS, dan JavaScrip
 
 ## Teknologi
 - HTML
-- CSS
+- Tailwind CSS
 - JavaScript

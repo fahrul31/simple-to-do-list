@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+</head>
+
+<body class="min-h-screen bg-gray-100 p-4">
+    <div class="container mx-auto max-w-4xl">
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="p-6 bg-white border-b">
+                <h1 class="text-2xl font-bold text-center text-gray-800">To-Do List</h1>
+            </div>
+
+            <div class="p-6">
+                <div class="flex space-x-2 mb-6">
+                    <input type="text" id="taskInput" placeholder="Tambahkan tugas..."
+                        class="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button id="addButton"
+                        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-plus mr-2"></i>Buat Tugas Baru
+                    </button>
+                </div>
+
+                <div id="emptyMessage" class="text-center text-gray-500 my-8">
+                    Tidak ada tugas saat ini. Tambahkan satu di atas!
+                </div>
+
+                <!-- Grid layout for tasks -->
+                <div id="taskGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Task class
+        class Task {
+            id;
+            text;
+            completed;
+            constructor(id, text, completed = false) {
+                this.id = id;
+                this.text = text;
+                this.completed = completed;
+            }
+
+            toggle() {
+                this.completed = !this.completed;
+            }
+
+            createElement() {
+                const taskElement = document.createElement('div');
+                taskElement.className = 'bg-white border rounded-lg shadow-sm p-4 flex flex-col';
+
+                const completedClass = this.completed ? 'line-through text-gray-400' : 'text-gray-700';
+
+                taskElement.innerHTML = `
+                    <div class="flex-1 mb-3">
+                        <p class="${completedClass} text-lg break-words">${this.text}</p>
+                    </div>
+                    <div class="flex justify-between mt-auto">
+                        <button class="toggle-button ${this.completed ? 'bg-green-500' : 'bg-gray-400'} text-white px-3 py-1 rounded-lg text-sm" data-id="${this.id}">
+                            ${this.completed ? 'Tugas Selesai' : 'Tandai Sebagai Selesai'}
+                        </button>
+                        <button class="delete-button bg-red-100 text-red-500 hover:bg-red-200 px-3 py-1 rounded-lg text-sm" data-id="${this.id}">
+                            Delete
+                        </button>
+                    </div>
+                `;
+
+                return taskElement;
+            }
+        }
+
+        // TodoList class
+        class TodoList {
+            // Task collection
+            tasks = [];
+            constructor() {
+                // DOM elements
+                this.taskInput = document.getElementById('taskInput');
+                this.addButton = document.getElementById('addButton');
+                this.taskGrid = document.getElementById('taskGrid');
+                this.emptyMessage = document.getElementById('emptyMessage');
+
+                // Initialize
+                this.loadTasks();
+                this.setupEventListeners();
+            }
+
+            // Load tasks from localStorage
+            loadTasks() {
+                const savedTasks = localStorage.getItem('tasks');
+                if (savedTasks) {
+                    const taskData = JSON.parse(savedTasks);
+                    this.tasks = taskData.map(data => new Task(data.id, data.text, data.completed));
+                    this.renderTasks();
+                }
+            }
+
+            // Save tasks to localStorage
+            saveTasks() {
+                localStorage.setItem('tasks', JSON.stringify(this.tasks));
+            }
+
+            // Set up event listeners
+            setupEventListeners() {
+                this.addButton.addEventListener('click', () => this.addTask());
+
+                this.taskInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.addTask();
+                    }
+                });
+
+                this.taskGrid.addEventListener('click', (e) => {
+                    const button = e.target.closest('button');
+                    if (!button) return;
+
+                    const id = button.getAttribute('data-id');
+
+                    if (button.classList.contains('toggle-button')) {
+                        this.toggleTask(id);
+                    } else if (button.classList.contains('delete-button')) {
+                        this.deleteTask(id);
+                    }
+                });
+            }
+
+            // Render all tasks
+            renderTasks() {
+                this.taskGrid.innerHTML = '';
+
+                if (this.tasks.length === 0) {
+                    this.emptyMessage.style.display = 'block';
+                } else {
+                    this.emptyMessage.style.display = 'none';
+
+                    this.tasks.forEach(task => {
+                        const taskElement = task.createElement();
+                        this.taskGrid.appendChild(taskElement);
+                    });
+                }
+            }
+
+            // Add a new task
+            addTask() {
+                const text = this.taskInput.value.trim();
+                if (text !== '') {
+                    const newTask = new Task(Date.now().toString(), text);
+                    this.tasks.push(newTask);
+                    this.saveTasks();
+                    this.renderTasks();
+
+                    this.taskInput.value = '';
+                }
+            }
+
+            // Toggle task completion status
+            toggleTask(id) {
+                const task = this.tasks.find(task => task.id === id);
+                if (task) {
+                    task.toggle();
+                    this.saveTasks();
+                    this.renderTasks();
+                }
+            }
+
+            // Delete a task
+            deleteTask(id) {
+                this.tasks = this.tasks.filter(task => task.id !== id);
+                this.saveTasks();
+                this.renderTasks();
+            }
+        }
+
+        // Initialize the TodoList when the DOM is loaded
+        document.addEventListener('DOMContentLoaded', function () {
+            const todoList = new TodoList();
+        });
+    </script>
+</body>
+
+</html>
