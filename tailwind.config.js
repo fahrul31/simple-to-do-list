@@ -1,7 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "pertemuan_16.html"
+    './src/utils/app.js',
+    './src/services/task.js',
+    './src/utils/index.html',
   ],
   theme: {
     extend: {},
